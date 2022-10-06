@@ -3,8 +3,14 @@ import { Table, Column, Model, DataType } from 'sequelize-typescript';
 interface NoteCreationAttrs {
   name: string,
   content: string,
-  // category: Category
+  categoryId: number
 }
+
+// interface Category {
+//   id: number,
+//   title: string,
+//   icon: string
+// }
 
 @Table
 export class Note extends Model<Note, NoteCreationAttrs> {
@@ -17,8 +23,8 @@ export class Note extends Model<Note, NoteCreationAttrs> {
   @Column({type: DataType.STRING, allowNull: false})
   content: string;
 
-  // @Column
-  // category: string;
+  @Column({type: DataType.INTEGER, allowNull: false})
+  categoryId: number;
 
   @Column({type: DataType.BOOLEAN, defaultValue: false})
   archived: boolean;

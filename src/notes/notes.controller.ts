@@ -5,13 +5,17 @@ import { CreateNoteDto } from './dto/createNote.dto';
  
 @Controller('notes')
 export default class NotesController {
-  constructor(
-    private readonly notesService: NotesService
-  ) {}
- 
+  constructor(private readonly notesService: NotesService) {}
+  
+  @Post()
+  async create(@Body() note: CreateNoteDto) {
+    return this.notesService.createNote(note);
+  }
+
   @Get()
-  getNotes() {
-    return this.notesService.getNotes();
+  getAll() {
+    const notes = this.notesService.getAllNotes();
+    return notes;
   }
  
   // @Get(':id')
@@ -19,10 +23,7 @@ export default class NotesController {
   //   return this.notesService.getNoteById(Number(id));
   // }
  
-  // @Post()
-  // async createNote(@Body() note: CreateNoteDto) {
-  //   return this.notesService.createNote(note);
-  // }
+  
  
   // @Put(':id')
   // async replaceNote(@Param('id') id: string, @Body() note: UpdateNoteDto) {

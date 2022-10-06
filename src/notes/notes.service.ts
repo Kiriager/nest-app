@@ -14,7 +14,7 @@ export default class NotesService {
     return note;
   }
 
-  async getNotes() {
+  async getAllNotes() {
     const notes = await this.noteRepository.findAll()
     return notes
   }

@@ -1,10 +1,11 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { SequelizeModule } from '@nestjs/sequelize';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { Note } from './notes/notes.model';
 import { NotesModule } from './notes/notes.module';
+import { CategoriesModule } from './categories/categories.module';
+import { Category } from './categories/categories.model';
+
 
 @Module({
   imports: [
@@ -18,12 +19,13 @@ import { NotesModule } from './notes/notes.module';
       // username: "postgres",
       // password: "root",
       database: process.env.POSTGRES_DB,
-      models: [Note],
+      models: [Note, Category],
       autoLoadModels: true
     }),
     NotesModule,
+    CategoriesModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [],
+  providers: [],
 })
 export class AppModule { }

@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Table, Column, Model, DataType } from 'sequelize-typescript';
+import { Table, Column, Model, DataType, HasOne } from 'sequelize-typescript';
+import { Category } from 'src/categories/categories.model';
 
 interface NoteCreationAttrs {
   name: string,
@@ -27,11 +28,14 @@ export class Note extends Model<Note, NoteCreationAttrs> {
   @Column({type: DataType.STRING, allowNull: false})
   content: string;
 
-  @ApiProperty({example: 1, description: "Unique identifier of note category"})
-  @Column({type: DataType.INTEGER, allowNull: false})
-  categoryId: number;
+  // @ApiProperty({example: 1, description: "Unique identifier of note category"})
+  // @Column({type: DataType.INTEGER, allowNull: false})
+  // categoryId: number;
 
   @ApiProperty({example: false, description: "Shows if note is active or archived (true means archived)"})
   @Column({type: DataType.BOOLEAN, defaultValue: false})
   archived: boolean;
+
+  @HasOne(() => Category)
+  category: Category;
 }

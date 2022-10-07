@@ -1,60 +1,61 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
+import { Category } from 'src/categories/categories.model';
+import { CategoriesService } from 'src/categories/categories.service';
 import { CreateNoteDto } from './dto/createNote.dto';
+import { categoryStatsDto } from './dto/stats.dto';
 import { Note } from './notes.model';
 // import UpdateNoteDto from './dto/updateNote.dto';
- 
+
 @Injectable()
 export default class NotesService {
 
-  constructor(@InjectModel(Note) private noteRepository: typeof Note) {} 
- 
+  constructor(@InjectModel(Note) private noteRepository: typeof Note,
+    private categoriesService: CategoriesService) { }
+
   async createNote(dto: CreateNoteDto) {
     const note = await this.noteRepository.create(dto)
+    const category = await this.categoriesService.getCategoryById(dto.categoryId)
+    await note.$set('category', category.id)
     return note;
   }
 
   async getAllNotes() {
-    const notes = await this.noteRepository.findAll()
+    const notes = await this.noteRepository.findAll({ include: { all: true } })
     return notes
   }
 
-  // getAllNotes() {
-  //   return this.notes;
-  // }
- 
-  // getNoteById(id: number) {
-  //   const note = this.notes.find(note => note.id === id);
-  //   if (note) {
-  //     return note;
-  //   }
-  //   throw new HttpException('Note not found', HttpStatus.NOT_FOUND);
-  // }
- 
-  // replaceNote(id: number, note: UpdateNoteDto) {
-  //   const noteIndex = this.notes.findIndex(note => note.id === id);
-  //   if (noteIndex > -1) {
-  //     this.notes[noteIndex] = note;
-  //     return note;
-  //   }
-  //   throw new HttpException('Note not found', HttpStatus.NOT_FOUND);
-  // }
- 
-  // createNote(note: CreateNoteDto) {
-  //   const newNote = {
-  //     id: ++this.lastNoteId,
-  //     ...note
-  //   }
-  //   this.notes.push(newNote);
-  //   return newNote;
-  // }
- 
-  // deleteNote(id: number) {
-  //   const noteIndex = this.notes.findIndex(note => note.id === id);
-  //   if (noteIndex > -1) {
-  //     this.notes.splice(noteIndex, 1);
-  //   } else {
-  //     throw new HttpException('Note not found', HttpStatus.NOT_FOUND);
-  //   }
-  // }
+  async getNoteById(id: number) {
+    const note = await this.noteRepository.findOne({ where: { id } })
+    return note
+  }
+
+  async deleteNoteById(id: number) {
+    const note = await this.noteRepository.findOne({ where: { id } })
+    await note.destroy()
+  }
+
+  async getStats() {
+    const categories = await this.categoriesService.getAllCategories()
+    const notes = await this.noteRepository.findAll()
+
+    let stats = categories.map((c) => {
+      return getCategoryStats(notes, c)
+    })
+    return stats;
+  }
+}
+
+function getCategoryStats(notes: Note[], category: Category): categoryStatsDto {
+  let categoryStats = { category: category, active: 0, archived: 0 }
+  notes.forEach(note => {
+    if (note.categoryId === category.id) {
+      if (note.archived) {
+        categoryStats.archived++
+      } else {
+        categoryStats.active++
+      }
+    }
+  })
+  return categoryStats
 }

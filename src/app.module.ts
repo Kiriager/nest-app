@@ -5,6 +5,9 @@ import { Note } from './notes/notes.model';
 import { NotesModule } from './notes/notes.module';
 import { CategoriesModule } from './categories/categories.module';
 import { Category } from './categories/categories.model';
+import { UsersController } from './users/users.controller';
+import { UsersService } from './users/users.service';
+import { UsersModule } from './users/users.module';
 
 
 @Module({
@@ -24,8 +27,9 @@ import { Category } from './categories/categories.model';
     }),
     NotesModule,
     CategoriesModule,
+    UsersModule,
   ],
-  controllers: [],
-  providers: [],
+  controllers: [UsersController],
+  providers: [UsersService],
 })
 export class AppModule { }
